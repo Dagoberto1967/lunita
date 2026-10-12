@@ -1,0 +1,175 @@
+---
+title: "MODELOS PROBABILISTICOS DISCRETOS"
+author: 
+  - name: Dagoberto Salgado Horta
+    affiliation: "Universidad del Tolima"
+    affiliation-url: "https://www.ut.edu.co/"
+date: today
+lang: es
+title-block-banner: "#98b6ed"
+
+format:
+  html:
+    page-layout: full
+    fontsize: 14pt
+    toc: true
+    toc-location: right
+    number-sections: true
+    code-fold: true
+    code-summary: "Ver código"
+    theme: dark
+    highlight-style: "BBE5ED"
+    html-math-method: katex
+    smooth-scroll: true
+    link-external-newwindow: true
+    code-overflow: scroll
+    favicon: favicon.ico
+    
+editor: visual
+
+knitr:
+  opts_chunk:
+    message: false
+    warning: false
+    fig.align: center
+    fig.width: 6
+    fig.height: 6
+    out.width: "70%"
+---
+
+```{=html}
+<div style="position:absolute; top:10px; right:10px;">
+<img src="Logo_ut.png" width="150">
+</div>
+```
+
+```{=html}
+<style>
+body{
+  background-color:#f7f6ed;
+  font-size:130%;
+  text-align:justify;
+}
+</style>
+```
+
+# .Cargar paquetes
+
+```{r}
+ipak <- function(pkg){
+
+  options(repos = c(CRAN="https://cloud.r-project.org"))
+
+  new.pkg <- pkg[!(pkg %in% rownames(installed.packages()))]
+
+  if(length(new.pkg)) install.packages(new.pkg, dependencies = TRUE)
+
+  invisible(lapply(pkg, function(p)
+    suppressPackageStartupMessages(library(p, character.only = TRUE))
+  ))
+}
+
+packages <- c("tidyverse","kableExtra")
+
+ipak(packages)
+```
+
+# .Ejercicio 1
+
+De acuerdo con un estudio publicado por un grupo de sociólogos de la Universidad de Massachusetts, aproximadamente 60% de los consumidores de Valium en el estado de Massachusetts empezaron a consumirlo a causa de problemas psicológicos. Calcule la probabilidad de que entre los siguientes 8 consumidores entrevistados de este estado:
+
+Exactamente 3 comenzaron a consumir Valium por problemas psicológicos.
+
+Al menos 5 comenzaron a consumir Valium por problemas psicológicos.
+
+## .Tabla de distribución de probabilidad
+
+```{r}
+n <- 8
+p <- 0.60
+x <- 0:n
+fx <- round(dbinom(x, n, p),4)
+Fx <- round(cumsum(fx),4)
+df = data.frame(x, fx, Fx)
+Form.Basic <- c("striped", "bordered", "hover", "condensed", "responsive")
+kable(df, align = "c") %>% 
+  kable_styling("striped", full_width = F) %>%
+  column_spec(1, bold = T) %>%
+  row_spec(0:9, bold = T, color = "#0d0d0d", background = "#eecafc")
+```
+
+## .Graficas
+
+::: panel-tabset
+## Función de probabilidad
+
+```{r}
+df_1 <- data.frame(x = x, fx = fx, xend = x, fxend = 0)
+
+ggplot(df_1, aes(x = x, y = fx)) +
+  geom_segment(aes(xend = xend, yend = fxend), color = "#b349f5", size = 1) +
+  geom_point(color = "#02b8fa", size = 2) +
+  labs(title = "Función de probabilidad binomial",
+       x = "x",
+       y = "f(x)")
+```
+
+## Función de distribución
+
+```{r}
+df_2 <- data.frame(x = x, Fx = Fx)
+
+ggplot(df_2, aes(x = x, y = Fx)) +
+  geom_step(color = "#e149f5", size = 1) +
+  geom_point(color = "#49f5ec", size = 2) +
+  labs(title = "Función de distribución binomial",
+       x = "x",
+       y = "F(X)")
+```
+:::
+
+## .Solución
+
+:::: panel-tabset
+## Inciso A)
+
+Calcule la probabilidad de que entre los siguientes 8 consumidores entrevistados de este estado:
+
+A. Exactamente 3 comenzaron a consumir Valium por problemas psicológicos.
+
+::: panel-tabset
+## Respuesta
+
+```{r}
+P_X3 <- round(dbinom(3,n,p),4)
+cat("P(X = 3) =", P_X3, "\n")
+```
+
+## Gráfica
+
+```{r}
+rango = 0:n
+df_3 = data.frame(x = rango, y = dbinom(rango, size=n, prob=p))
+ggplot(df_3, aes(x = x, y = y, fill=factor(ifelse(x==3,"Valor","Resto")))) +
+geom_bar(stat = "identity",width = 0.25) + xlab("x") + ylab("Cuantía") +
+ggtitle("Distribución Binomial") +
+scale_fill_manual(name = "", values=c("#b349f5","#02b8fa")) + theme_bw()
+```
+:::
+
+```{r}
+n <- 15
+p <- 0.25
+x <- 0:n
+fx <- round(dbinom(x, n, p),4)
+Fx <- round(cumsum(fx),4)
+df = data.frame(x, fx, Fx)
+Form.Basic <- c("striped", "bordered", "hover", "condensed", "responsive")
+kable(df, align = "c") %>% 
+  kable_styling("striped", full_width = F) %>%
+  column_spec(1, bold = T) %>%
+  row_spec(0:16, bold = T, color = "#0d0d0d", background = "#93d1f5")
+```
+
+## Inciso B)
+::::
